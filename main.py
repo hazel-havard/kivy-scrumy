@@ -2,10 +2,17 @@ import kivy
 kivy.require('1.7.1')
 
 from kivy.app import App
+from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.boxlayout import BoxLayout 
 
 class LoginScreen(Screen):
-    pass
+    scrumIdInput = ObjectProperty()
+    passwordInput = ObjectProperty()
+    
+    def login(self):
+        print("login: " + self.scrumIdInput.text + ", password: " + self.passwordInput.text)
+        self.manager.current = 'main'
         
 class MainScreen(Screen):
     pass

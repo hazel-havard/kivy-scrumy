@@ -6,6 +6,40 @@ ScrumScreenManager:
 
 <LoginScreen>:
     name: 'login'
-	
+    scrumIdInput: scrum_id_input
+    passwordInput: password_input
+
+    BoxLayout:
+        orientation: 'vertical'
+
+        Label:
+            text: 'Scrum'
+            font_size: 24
+            size_hint_y: .1
+
+        GridLayout:
+            cols: 2
+
+            Label:
+                text: 'Scrum name:'
+
+            TextInput:
+                multiline: False
+                id: scrum_id_input
+                height: 20
+
+            Label:
+                text: 'Password:'
+
+            TextInput:
+                multiline: False
+                password: True
+                id: password_input
+                height: 20
+
+        Button:
+            text: 'Login'
+            on_press: root.login()
+
 <MainScreen>
     name: 'main'
