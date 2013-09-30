@@ -14,6 +14,9 @@ class LoginScreen(Screen):
         print("login: " + self.scrumIdInput.text + ", password: " + self.passwordInput.text)
         self.manager.current = 'main'
         
+class StickyNote(BoxLayout):
+	pass
+
 class MainScreen(Screen):
     pass
 

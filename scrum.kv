@@ -41,5 +41,68 @@ ScrumScreenManager:
             text: 'Login'
             on_press: root.login()
 
+<StickyNote>
+	orientation: 'vertical'
+	canvas.before:
+		Color:
+			rgba: 1, 0, 0, 1
+		Rectangle:
+			pos: self.pos
+			size: self.size
+	
+	Label:
+		text: 'Task'
+	Label:
+		text: 'Person'
+	
+	
 <MainScreen>
     name: 'main'
+    ScrollView:
+    	BoxLayout:
+    		orientation: 'vertical'
+    		
+    		Label:
+    			text: 'Scrum'
+    			
+    		GridLayout:
+    			cols: 5
+    			
+    			Label:
+    				text: 'Stories'
+    			Label: 
+    				text: 'To Do'
+    			Label:
+    				text: 'In Progress'
+    			Label:
+    				text: 'Verify'
+    			Label:
+    				text: 'Completed'
+    			
+    			Label: 
+    				text: 'Story 1'
+    			GridLayout:
+    				cols: 2
+    				StickyNote:
+    				StickyNote:
+    			GridLayout:
+    				cols: 2
+    			GridLayout:
+    				cols: 2
+    			GridLayout:
+    				cols: 2
+    				
+    			Label: 
+    				text: 'Story 2'
+    			GridLayout:
+    				cols: 2
+    			GridLayout:
+    				cols: 2
+    			GridLayout:
+    				cols: 2
+    				StickyNote:
+    				StickyNote:
+    			GridLayout:
+    				cols: 2
+    			
+    				
