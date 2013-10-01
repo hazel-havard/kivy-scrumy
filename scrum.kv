@@ -14,31 +14,45 @@ ScrumScreenManager:
 
         Label:
             text: 'Scrum'
-            font_size: 24
-            size_hint_y: .1
+            font_size: 48
+            size_hint_y: None
+            height: '200dp'
 
         GridLayout:
             cols: 2
+            padding: '10dp'
+            spacing: '10dp'
+            row_default_height: '40dp'
+            row_force_default: True
 
             Label:
                 text: 'Scrum name:'
+                halign: 'right'
+                valign: 'middle'
+                text_size: self.size
 
             TextInput:
                 multiline: False
+                size_hint_x: None if root.width > 600 else 1
+                width: '200dp'
                 id: scrum_id_input
-                height: 20
 
             Label:
                 text: 'Password:'
+                halign: 'right'
+                valign: 'middle'
+                text_size: self.size
 
             TextInput:
                 multiline: False
                 password: True
+                width: '200dp'
                 id: password_input
-                height: 20
 
         Button:
             text: 'Login'
+            size_hint_y: None
+            height: '40dp'
             on_press: root.login()
 
 <StickyNote>
