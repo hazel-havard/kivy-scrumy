@@ -5,6 +5,8 @@ from kivy.app import App
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.boxlayout import BoxLayout 
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.label import Label
 
 class LoginScreen(Screen):
     scrumIdInput = ObjectProperty()
@@ -16,6 +18,12 @@ class LoginScreen(Screen):
         
 class StickyNote(BoxLayout):
 	pass
+
+class TitleLabel(Label):
+    pass
+
+class GridData(GridLayout):
+    pass
 
 class MainScreen(Screen):
     pass
