@@ -56,28 +56,28 @@ ScrumScreenManager:
             on_press: root.login()
 
 <StickyNote>:
-	orientation: 'vertical'
+    orientation: 'vertical'
     size_hint: None, None
     size: '100dp', '100dp'
-	canvas.before:
-		Color:
-			rgba: 1, 0, 0, 1
-		Rectangle:
-			pos: self.pos
-			size: self.size
-	
-	Label:
-		text: 'Task'
+    canvas.before:
+        Color:
+            rgba: 1, 0, 0, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    
+    Label:
+        text: root.name
         font_size: '12dp'
         size_hint_y: .8
         text_size: self.size
         valign: 'top'
         halign: 'center'
-	Label:
-		text: 'Person'
+    Label:
+        text: root.person
         font_size: '10dp'
         size_hint_y: .2
-	
+    
 <TitleLabel>:
     font_size: '14dp'
     size_hint: None, None
@@ -90,56 +90,40 @@ ScrumScreenManager:
     size: '220dp', '120dp'
     padding: '10dp'
     spacing: '10dp'
-	
+    
 <MainScreen>:
     name: 'main'
+    grid: main_grid
+
     ScrollView:
-    	BoxLayout:
-    		orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
             size_hint: None, None
             width: main_grid.width
             height: '400dp'
-    		
-    		Label:
-    			text: 'Scrum'
+            
+            Label:
+                text: 'Scrum'
                 font_size: '16dp'
                 text_size: self.size
                 valign: 'middle'
                 halign: 'left'
                 size_hint_y: None
                 height: '30dp'
-    			
-    		GridLayout:
+                
+            GridLayout:
                 id: main_grid
-    			cols: 5
+                cols: 5
                 size_hint_x: None
                 width: '1100dp'
-    			
-    			TitleLabel:
-    				text: 'Stories'
-    			TitleLabel: 
-    				text: 'To Do'
-    			TitleLabel:
-    				text: 'In Progress'
-    			TitleLabel:
-    				text: 'Verify'
-    			TitleLabel:
-    				text: 'Completed'
-    			
-    			TitleLabel: 
-    				text: 'Story 1'
-    			GridData:
-    				StickyNote:
-    				StickyNote:
-    			GridData:
-    			GridData:
-    			GridData:
-    				
-    			TitleLabel: 
-    				text: 'Story 2'
-    			GridData:
-    			GridData:
-    			GridData:
-    				StickyNote:
-    				StickyNote:
-    			GridData:
+                
+                TitleLabel:
+                    text: 'Stories'
+                TitleLabel: 
+                    text: 'To Do'
+                TitleLabel:
+                    text: 'In Progress'
+                TitleLabel:
+                    text: 'Verify'
+                TitleLabel:
+                    text: 'Completed'
