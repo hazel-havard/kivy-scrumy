@@ -55,28 +55,42 @@ ScrumScreenManager:
             height: '40dp'
             on_press: root.login()
 
+<TaskNameLabel>:
+    font_size: '12dp'
+    size_hint_y: .8
+    text_size: self.size
+    valign: 'top'
+    halign: 'center'
+
+<TaskPersonLabel>:
+    font_size: '10dp'
+    size_hint_y: .2
+
+<TaskNameInput>:
+    size_hint_y: .7
+    font_size: '12dp'
+    on_text: self.save()
+
+<TaskPersonInput>:
+    size_hint_y: .3
+    font_size: '10dp'
+    on_text: self.save()
+
 <StickyNote>:
     orientation: 'vertical'
     size_hint: None, None
     size: '100dp', '100dp'
     canvas.before:
         Color:
-            rgba: 1, 0, 0, 1
+            rgba: self.background
         Rectangle:
             pos: self.pos
             size: self.size
     
-    Label:
-        text: root.name
-        font_size: '12dp'
-        size_hint_y: .8
-        text_size: self.size
-        valign: 'top'
-        halign: 'center'
-    Label:
-        text: root.person
-        font_size: '10dp'
-        size_hint_y: .2
+    TaskNameLabel:
+        text: root.task.name
+    TaskPersonLabel:
+        text: root.task.person
     
 <TitleLabel>:
     font_size: '14dp'
@@ -94,6 +108,7 @@ ScrumScreenManager:
 <MainScreen>:
     name: 'main'
     grid: main_grid
+    buttonArea: button_area_layout
 
     ScrollView:
         BoxLayout:
@@ -127,3 +142,8 @@ ScrumScreenManager:
                     text: 'Verify'
                 TitleLabel:
                     text: 'Completed'
+
+            BoxLayout:
+                id: button_area_layout
+                size_hint_y: None
+                height: '40dp'
