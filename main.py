@@ -65,7 +65,25 @@ class TitleLabel(Label):
     pass
 
 class GridData(GridLayout):
-    pass
+    def on_touch_up(self, touch):
+        if self.collide_point(*touch.pos):
+            mainScreen = ScrumApp.get_running_app().root.get_screen('main')
+            if mainScreen.mode == 'move':
+                parent = mainScreen.selectedSticky.parent
+                oldStoryName = parent.id[:parent.id.index('_')]
+                parent.remove_widget(mainScreen.selectedSticky)
+                self.add_widget(mainScreen.selectedSticky)
+                task = mainScreen.selectedSticky.task
+                task.status = self.id[self.id.index('_') + 1:]
+                newStoryName = self.id[:self.id.index('_')]
+                for story in mainScreen.stories:
+                    if story.name == oldStoryName:
+                        story.tasks.remove(task)
+                    elif story.name == newStoryName:
+                        story.tasks.append(task)
+                mainScreen.mode = 'view'
+                return True
+        return super(GridData, self).on_touch_up(touch)
 
 class MainScreen(Screen):
     grid = ObjectProperty()
@@ -128,7 +146,7 @@ class MainScreen(Screen):
             self.stickies.remove(self.selectedSticky)
 
     def move(self, instance):
-        pass
+        self.mode = 'move'
 
     def showButtons(self):
         editButton = Button(text='edit', on_press=self.edit)
@@ -145,6 +163,7 @@ class MainScreen(Screen):
             self.buttonArea.clear_widgets()
             if self.mode == 'edit' and not self.selectedSticky.collide_point(*touch.pos):
                 self.exitEdit()
+        super(MainScreen, self).on_touch_up(touch)
 
 class ScrumScreenManager(ScreenManager):
     pass
