@@ -25,6 +25,7 @@ class LoginScreen(Screen):
     scrumIdInput = ObjectProperty()
     passwordInput = ObjectProperty()
     
+    # For now, just spit the login info onto the console.
     def login(self):
         print("login: " + self.scrumIdInput.text + ", password: " + self.passwordInput.text)
         mainScreen = ScrumApp.get_running_app().root.get_screen('main')
@@ -52,11 +53,12 @@ class StickyNote(BoxLayout):
         self.task = task
         super(StickyNote, self).__init__()
 
+    # Select the sticky being touched if in view mode
     def on_touch_up(self, touch):
         if self.collide_point(*touch.pos):
             mainScreen = ScrumApp.get_running_app().root.get_screen('main')
-            mainScreen.selectedSticky = self
             if mainScreen.mode == 'view':
+                mainScreen.selectedSticky = self
                 self.background = (0, 0, 1, 1)
                 mainScreen.showButtons()
             return True
@@ -65,6 +67,7 @@ class TitleLabel(Label):
     pass
 
 class GridData(GridLayout):
+    # handle moving stickies if in move mode
     def on_touch_up(self, touch):
         if self.collide_point(*touch.pos):
             mainScreen = ScrumApp.get_running_app().root.get_screen('main')
@@ -79,7 +82,8 @@ class GridData(GridLayout):
                 for story in mainScreen.stories:
                     if story.name == oldStoryName:
                         story.tasks.remove(task)
-                    elif story.name == newStoryName:
+                for story in mainScreen.stories:
+                    if story.name == newStoryName:
                         story.tasks.append(task)
                 mainScreen.mode = 'view'
                 return True
@@ -90,6 +94,7 @@ class MainScreen(Screen):
     buttonArea = ObjectProperty()
     stickies = ListProperty()
     selectedSticky = ObjectProperty()
+    # current screen mode can be view, edit, or move
     mode = StringProperty('view')
 
     oatTask = Task('make oatmeal', 'verify', 'wolf')
@@ -145,6 +150,7 @@ class MainScreen(Screen):
             self.selectedSticky.parent.remove_widget(self.selectedSticky)
             self.stickies.remove(self.selectedSticky)
 
+    # guts of move handled by GridData class
     def move(self, instance):
         self.mode = 'move'
 
