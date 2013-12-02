@@ -11,6 +11,7 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from base64 import b64encode
 from httplib import HTTPSConnection
+from urllib import urlencode
 import json
 
 class Story():
@@ -176,10 +177,20 @@ class MainScreen(Screen):
         self.selectedSticky.add_widget(TaskPersonInput(text = self.selectedSticky.task.person))
 
     def exitEdit(self):
+        task = self.selectedSticky.task
+        name = task.name
+        person = task.person
         self.mode = 'view'
         self.selectedSticky.clear_widgets()
-        self.selectedSticky.add_widget(TaskNameLabel(text = self.selectedSticky.task.name))
-        self.selectedSticky.add_widget(TaskPersonLabel(text = self.selectedSticky.task.person))
+        self.selectedSticky.add_widget(TaskNameLabel(text = name))
+        self.selectedSticky.add_widget(TaskPersonLabel(text = person))
+        conn = HTTPSConnection('scrumy.com')
+        params = urlencode({'title': task.name, 'scrumer_name': task.person})
+        conn.request('PUT', '/api/tasks/%s?%s' % (task.id, params), '', headers=self.headers)
+        response = conn.getresponse()
+        if response.status != 200:
+            print('Error: put response was %s %s' % (response.status, response.reason))
+        conn.close()
 
     def delete(self, instance):
         if self.selectedSticky.parent is not None:
