@@ -9,6 +9,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
+from base64 import b64encode
+from httplib import HTTPSConnection
 
 class Story():
     def __init__(self, name, taskList):
@@ -25,12 +27,21 @@ class LoginScreen(Screen):
     scrumIdInput = ObjectProperty()
     passwordInput = ObjectProperty()
     
-    # For now, just spit the login info onto the console.
     def login(self):
-        print("login: " + self.scrumIdInput.text + ", password: " + self.passwordInput.text)
-        mainScreen = ScrumApp.get_running_app().root.get_screen('main')
-        mainScreen.refresh()
-        self.manager.current = 'main'
+        username = self.scrumIdInput.text
+        password = self.passwordInput.text
+        conn = HTTPSConnection('scrumy.com')
+        rawLogin = b"%s:%s" % (username, password)
+        loginInfo = b64encode(rawLogin).decode("ascii")
+        headers = {'Authorization': 'Basic %s' % loginInfo}
+        conn.request('GET', '/api/scrumies/%s' % username, headers=headers)
+        response = conn.getresponse()
+        if response.status == 200:
+            mainScreen = ScrumApp.get_running_app().root.get_screen('main')
+            mainScreen.refresh()
+            self.manager.current = 'main'
+        else:
+            print("error: could not authenticate")
 
 class TaskNameLabel(Label):
     pass
