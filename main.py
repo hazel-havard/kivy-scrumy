@@ -11,6 +11,7 @@ from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
 from base64 import b64encode
 from httplib import HTTPSConnection
+import json
 
 class Story():
     def __init__(self, name, taskList):
@@ -38,6 +39,8 @@ class LoginScreen(Screen):
         response = conn.getresponse()
         if response.status == 200:
             mainScreen = ScrumApp.get_running_app().root.get_screen('main')
+            mainScreen.username = username
+            mainScreen.headers = headers
             mainScreen.refresh()
             self.manager.current = 'main'
         else:
@@ -108,36 +111,45 @@ class MainScreen(Screen):
     # current screen mode can be view, edit, or move
     mode = StringProperty('view')
 
-    oatTask = Task('make oatmeal', 'verify', 'wolf')
-    eatTask = Task('eat grandma', 'in_progress', 'wolf')
-    appleTask = Task('do not eat apple', 'to_do', 'wolf')
-    redTask = Task('kill red riding hood', 'to_do', 'wolf')
-    furTask = Task('comb fur', 'to_do', 'wolf')
-    wolfStory = Story('Big Bad Wolf', [oatTask, eatTask, appleTask, redTask, furTask])
-
-    hairTask = Task('cut hair', 'verify', 'goldilocks')
-    beTask = Task('break and enter', 'to_do', 'goldilocks')
-    vandalizeTask = Task('vandalize', 'to_do', 'golidlocks')
-    goldStory = Story('Goldilocks', [hairTask, beTask, vandalizeTask])
-
-    stories = [wolfStory, goldStory]
+    stories = []
 
     def refresh(self):
+        conn = HTTPSConnection('scrumy.com')
+        conn.request('GET', '/api/scrumies/%s/sprints/current.json' % self.username, headers=self.headers)
+        response = conn.getresponse()
+        if response.status != 200:
+            print('Error:server responded %s: %s' % (response.status, response.reason))
+            return
+        scrumJSON = response.read()
+        scrum = json.loads(scrumJSON)
+        sprint = scrum['sprint']
+        stories = []
+        for rawStory in sprint['stories']:
+            story = Story(rawStory['story']['title'], [])
+            for rawTask in rawStory['story']['tasks']:
+                task = Task(rawTask['task']['title'], rawTask['task']['state'], rawTask['task']['scrumer']['name'])
+                story.tasks.append(task)
+            stories.append(story)
+        self.stories = stories
+        self.drawGrid()
+
+
+    def drawGrid(self):
         for story in self.stories:
             self.grid.add_widget(TitleLabel(text=story.name))
-            to_do = GridData(id=story.name + "_" + "to_do")
-            self.grid.add_widget(to_do)
-            in_progress = GridData(id=story.name + "_" + "in_progress")
-            self.grid.add_widget(in_progress)
+            todo = GridData(id=story.name + "_" + "todo")
+            self.grid.add_widget(todo)
+            inprogress = GridData(id=story.name + "_" + "inprogress")
+            self.grid.add_widget(inprogress)
             verify = GridData(id=story.name + "_" + "verify")
             self.grid.add_widget(verify)
             done = GridData(id=story.name + "_" + "done")
             self.grid.add_widget(done)
             for task in story.tasks:
-                if task.status == 'to_do':
-                    cell = to_do
-                elif task.status == 'in_progress':
-                    cell = in_progress
+                if task.status == 'todo':
+                    cell = todo
+                elif task.status == 'inprogress':
+                    cell = inprogress
                 elif task.status == 'verify':
                     cell = verify
                 elif task.status == 'done':
