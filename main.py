@@ -140,6 +140,12 @@ class MainScreen(Screen):
 
 
     def drawGrid(self):
+        self.grid.clear_widgets()
+        self.grid.add_widget(TitleLabel(text='Stories'))
+        self.grid.add_widget(TitleLabel(text='To Do'))
+        self.grid.add_widget(TitleLabel(text='In Progress'))
+        self.grid.add_widget(TitleLabel(text='Verify'))
+        self.grid.add_widget(TitleLabel(text='Completed'))
         for story in self.stories:
             self.grid.add_widget(TitleLabel(text=story.name))
             todo = GridData(id=story.name + "_" + "todo")
