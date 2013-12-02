@@ -19,10 +19,11 @@ class Story():
         self.tasks = taskList
 
 class Task():
-    def __init__(self, name, status, person):
+    def __init__(self, name, status, person, id):
         self.name = name
         self.status = status
         self.person = person
+        self.id = id
 
 class LoginScreen(Screen):
     scrumIdInput = ObjectProperty()
@@ -37,6 +38,7 @@ class LoginScreen(Screen):
         headers = {'Authorization': 'Basic %s' % loginInfo}
         conn.request('GET', '/api/scrumies/%s' % username, headers=headers)
         response = conn.getresponse()
+        conn.close()
         if response.status == 200:
             mainScreen = ScrumApp.get_running_app().root.get_screen('main')
             mainScreen.username = username
@@ -119,15 +121,18 @@ class MainScreen(Screen):
         response = conn.getresponse()
         if response.status != 200:
             print('Error:server responded %s: %s' % (response.status, response.reason))
+            conn.close()
             return
         scrumJSON = response.read()
+        conn.close()
         scrum = json.loads(scrumJSON)
         sprint = scrum['sprint']
         stories = []
         for rawStory in sprint['stories']:
             story = Story(rawStory['story']['title'], [])
             for rawTask in rawStory['story']['tasks']:
-                task = Task(rawTask['task']['title'], rawTask['task']['state'], rawTask['task']['scrumer']['name'])
+                task = Task(rawTask['task']['title'], rawTask['task']['state'], \
+                        rawTask['task']['scrumer']['name'], rawTask['task']['id'])
                 story.tasks.append(task)
             stories.append(story)
         self.stories = stories
@@ -172,8 +177,14 @@ class MainScreen(Screen):
 
     def delete(self, instance):
         if self.selectedSticky.parent is not None:
-            self.selectedSticky.parent.remove_widget(self.selectedSticky)
-            self.stickies.remove(self.selectedSticky)
+            conn = HTTPSConnection('scrumy.com')
+            conn.request('DELETE', '/api/tasks/%s' % self.selectedSticky.task.id, headers=self.headers)
+            response = conn.getresponse()
+            conn.close()
+            if response.status != 200:
+                print('Error: Delete response was %s %s' % (response.status, response.reason))
+                return
+            self.refresh()
 
     # guts of move handled by GridData class
     def move(self, instance):
