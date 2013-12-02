@@ -100,7 +100,9 @@ class MainScreen(Screen):
     oatTask = Task('make oatmeal', 'verify', 'wolf')
     eatTask = Task('eat grandma', 'in_progress', 'wolf')
     appleTask = Task('do not eat apple', 'to_do', 'wolf')
-    wolfStory = Story('Big Bad Wolf', [oatTask, eatTask, appleTask])
+    redTask = Task('kill red riding hood', 'to_do', 'wolf')
+    furTask = Task('comb fur', 'to_do', 'wolf')
+    wolfStory = Story('Big Bad Wolf', [oatTask, eatTask, appleTask, redTask, furTask])
 
     hairTask = Task('cut hair', 'verify', 'goldilocks')
     beTask = Task('break and enter', 'to_do', 'goldilocks')
