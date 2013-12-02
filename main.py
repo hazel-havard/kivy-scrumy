@@ -15,9 +15,10 @@ from urllib import urlencode
 import json
 
 class Story():
-    def __init__(self, name, taskList):
+    def __init__(self, name, taskList, id):
         self.name = name
         self.tasks = taskList
+        self.id = id
 
 class Task():
     def __init__(self, name, status, person, id):
@@ -84,25 +85,26 @@ class TitleLabel(Label):
     pass
 
 class GridData(GridLayout):
+    def __init__(self, storyId, state, **kwargs):
+        self.storyId = storyId
+        self.state = state
+        super(GridData, self).__init__()
+
     # handle moving stickies if in move mode
     def on_touch_up(self, touch):
         if self.collide_point(*touch.pos):
             mainScreen = ScrumApp.get_running_app().root.get_screen('main')
             if mainScreen.mode == 'move':
-                parent = mainScreen.selectedSticky.parent
-                oldStoryName = parent.id[:parent.id.index('_')]
-                parent.remove_widget(mainScreen.selectedSticky)
-                self.add_widget(mainScreen.selectedSticky)
                 task = mainScreen.selectedSticky.task
-                task.status = self.id[self.id.index('_') + 1:]
-                newStoryName = self.id[:self.id.index('_')]
-                for story in mainScreen.stories:
-                    if story.name == oldStoryName:
-                        story.tasks.remove(task)
-                for story in mainScreen.stories:
-                    if story.name == newStoryName:
-                        story.tasks.append(task)
+                conn = HTTPSConnection('scrumy.com')
+                params = urlencode({'story_id': self.storyId, 'state': self.state})
+                conn.request('PUT', '/api/tasks/%s?%s' % (task.id, params), '', headers=mainScreen.headers)
+                response = conn.getresponse()
+                if response.status != 200:
+                    print('Error: put status was %s %s' % (response.status, response.reason))
+                conn.close()
                 mainScreen.mode = 'view'
+                mainScreen.refresh()
                 return True
         return super(GridData, self).on_touch_up(touch)
 
@@ -130,7 +132,7 @@ class MainScreen(Screen):
         sprint = scrum['sprint']
         stories = []
         for rawStory in sprint['stories']:
-            story = Story(rawStory['story']['title'], [])
+            story = Story(rawStory['story']['title'], [], rawStory['story']['id'])
             for rawTask in rawStory['story']['tasks']:
                 task = Task(rawTask['task']['title'], rawTask['task']['state'], \
                         rawTask['task']['scrumer']['name'], rawTask['task']['id'])
@@ -149,13 +151,13 @@ class MainScreen(Screen):
         self.grid.add_widget(TitleLabel(text='Completed'))
         for story in self.stories:
             self.grid.add_widget(TitleLabel(text=story.name))
-            todo = GridData(id=story.name + "_" + "todo")
+            todo = GridData(story.id, "todo")
             self.grid.add_widget(todo)
-            inprogress = GridData(id=story.name + "_" + "inprogress")
+            inprogress = GridData(story.id, "inprogress")
             self.grid.add_widget(inprogress)
-            verify = GridData(id=story.name + "_" + "verify")
+            verify = GridData(story.id, "verify")
             self.grid.add_widget(verify)
-            done = GridData(id=story.name + "_" + "done")
+            done = GridData(story.id, "done")
             self.grid.add_widget(done)
             for task in story.tasks:
                 if task.status == 'todo':
